@@ -1,0 +1,19 @@
+EdgeGecV2 is a separately replaceable LGPL-3.0 library derived from edge-tts 7.3.0.
+Original code: https://github.com/rany2/edge-tts/tree/7.3.0
+The main adapter and HD code retain their respective MIT notices.
+
+Complete corresponding source for this DLL is in this archive, including the
+ported algorithm/tables, C ABI wrapper, project and both LGPLv3/GPLv3 texts.
+No proprietary SDK is needed to rebuild this DLL.
+
+From Visual Studio Developer PowerShell with C++ tools and Windows SDK:
+msbuild EdgeGecV2/EdgeGecV2.vcxproj /p:Configuration=Release /p:Platform=x64 /p:OutDir=$PWD/out/x64/
+msbuild EdgeGecV2/EdgeGecV2.vcxproj /p:Configuration=Release /p:Platform=Win32 /p:OutDir=$PWD/out/x86/
+Use /p:PlatformToolset=v143 if using VS 2022; the project defaults to v145.
+
+Close reader processes, then replace EdgeGecV2.dll of the matching bitness
+beside NaturalVoiceSAPIAdapter.dll in the installed version folder. Admin
+rights are needed for Program Files. No signature check prevents replacement.
+Reopen the reader. Existing processes keep the old DLL loaded until exit.
+You may modify and reverse engineer the combined work for debugging changes
+to this LGPL component as allowed by LGPLv3. No additional restriction is imposed.

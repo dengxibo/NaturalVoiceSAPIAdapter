@@ -1,4 +1,4 @@
-﻿// VoiceTokenEnumerator.cpp: CVoiceTokenEnumerator 的实现
+// VoiceTokenEnumerator.cpp: CVoiceTokenEnumerator 的实现
 #include "pch.h"
 #include "VoiceTokenEnumerator.h"
 #include <VersionHelpers.h>
@@ -12,6 +12,7 @@
 #include "RegKey.h"
 #include "SapiException.h"
 #include "Logger.h"
+#include "LocalVoiceKind.h"
 
 
 // CVoiceTokenEnumerator
@@ -147,6 +148,10 @@ HRESULT CVoiceTokenEnumerator::FinalConstruct() noexcept
                 }
             }
         }
+        // A fresh full install can reuse the conventional local model folder
+        // without overwriting an existing per-user path or copying any model.
+        if (narratorVoicePath.empty() && PathIsDirectoryW(L"C:\\TTS"))
+            narratorVoicePath = L"C:\\TTS";
         ErrorMode errorMode = static_cast<ErrorMode>(std::clamp(key.GetDword(L"DefaultErrorMode", 0UL), 0UL, 2UL));
 
         if (!key.GetDword(L"Disable"))
@@ -398,7 +403,7 @@ void CVoiceTokenEnumerator::EnumLocalVoices(TokenMap& tokens, ErrorMode errorMod
         for (auto package : packages)
         {
             if (package.Id().Name().starts_with(L"MicrosoftWindows.Voice."))
-                paths.push_back(WStringToUTF8(package.InstalledPath()));
+                if (!IsHdVoicePath(package.InstalledPath().c_str())) paths.push_back(WStringToUTF8(package.InstalledPath()));
         }
         if (paths.empty())
             return;
@@ -510,6 +515,7 @@ void CVoiceTokenEnumerator::EnumLocalVoicesInFolder(TokenMap& tokens, LPCWSTR ba
         // but the current directory is a process-wide setting and changing it is not thread-safe
 
         auto paths = FindVoiceFolders(basepath);
+        std::erase_if(paths, [](const auto& path) { return IsHdVoicePath(UTF8ToWString(path)); });
         if (paths.empty())
             return;
 

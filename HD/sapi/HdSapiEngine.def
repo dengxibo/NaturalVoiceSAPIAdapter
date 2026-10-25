@@ -1,0 +1,4 @@
+LIBRARY HdSapiEngine
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE

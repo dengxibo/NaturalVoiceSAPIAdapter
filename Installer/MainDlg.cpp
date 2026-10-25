@@ -11,6 +11,15 @@ INT_PTR CALLBACK AzureKeyDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 void Register(bool is64Bit);
 void Unregister(bool is64Bit);
 
+static bool IsFullSettingsOnly()
+{
+    WCHAR file[MAX_PATH]{};
+    if (!GetModuleFileNameW(nullptr, file, MAX_PATH)) return false;
+    const WCHAR* name = wcsrchr(file, L'\\');
+    const WCHAR* filename = name ? name + 1 : file;
+    return _wcsicmp(filename, L"AdvancedInstaller.exe") == 0 || _wcsicmp(filename, L"VoiceSettings.exe") == 0;
+}
+
 static void CheckInstallation(bool is64Bit, HWND hDlg, UINT idStatic, UINT idUninstallBtn)
 {
     WCHAR szText[256];
@@ -58,6 +67,11 @@ static void UpdateDisplay(HWND hDlg)
 {
     CheckInstallation(false, hDlg, IDC_STATIC_32BIT_STATUS, IDC_UNINSTALL_32BIT);
     CheckInstallation(true, hDlg, IDC_STATIC_64BIT_STATUS, IDC_UNINSTALL_64BIT);
+    if (IsFullSettingsOnly())
+    {
+        for (UINT id : {IDC_INSTALL_32BIT, IDC_INSTALL_64BIT, IDC_UNINSTALL_32BIT, IDC_UNINSTALL_64BIT})
+            EnableWindow(GetDlgItem(hDlg, id), FALSE);
+    }
 
     RegKey key = RegOpenEnumeratorConfigKey();
     CheckDlgButton(hDlg, IDC_CHK_NARRATOR_VOICES,

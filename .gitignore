@@ -365,3 +365,8 @@ FodyWeavers.xsd
 # Folder for released files
 /releasepack
 /NaturalVoiceSAPIAdapter/NaturalVoiceSAPIAdapter_i.h
+
+HD/bin/
+HD/obj/
+dist/
+logs/

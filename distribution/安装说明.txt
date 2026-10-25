@@ -1,0 +1,18 @@
+双击 Installer.exe，选择“是”，通过 Windows 管理员确认即可安装或升级。
+完成后，完全退出并重新打开朗读软件。
+
+选择“否”可打开声音高级设置。卸载请用 Windows“已安装的应用”，
+或运行安装目录内的 Installer.exe /uninstall。
+
+data 文件夹是安装所需文件，请保留在 Installer.exe 旁边。
+运行依赖、完整说明、许可证和开发者资料均已收进 data，不必逐个操作。
+
+HD 与普通同名音色分别保留。HD 需要本机已有匹配的 Windows 系统扩展
+和模型；本包不含模型或系统运行库。预合成需要朗读软件接入。
+
+当前为公开测试版；第三方许可核对记录见 data/docs/许可证与依赖.md。
+使用前请阅读 data/licenses 中适用条款，完整说明见 data/使用说明.txt。
+
+独立安装：本包已含自己的引擎和所需应用运行依赖，无需预先安装
+上游 NaturalVoiceSAPIAdapter、旧 HD 桥接器或 TtsApplication 示例程序。
+旧安装只用于可选迁移已有模型位置，不作为先决条件。模型和 Windows 系统组件仍须本机可用。

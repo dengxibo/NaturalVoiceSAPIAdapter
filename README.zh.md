@@ -1,3 +1,8 @@
+> 本地整合分支：以 v0.2.9 fork + 已验证 secv2 为基础，不采用 v0.2.10 修复。
+> 统一安装包加入独立 HD 引擎和公开预合成服务，HD 与普通同名音色分别保留。
+> 构建与审查请先看 [整合与构建](docs/整合与构建.md) 和 [许可证与依赖](docs/许可证与依赖.md)。
+> 当前发布为独立安装测试版；第三方组件保留各自许可，Embedded Speech 附加分发批准尚未核验，详见许可记录。
+> 下方保留上游原说明，完整包使用新的统一 Installer.exe，不需要先安装上游再覆盖补丁。
 # NaturalVoiceSAPIAdapter
 
 [For the English version, click here](README.md)
