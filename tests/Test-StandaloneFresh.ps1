@@ -6,7 +6,8 @@ $ErrorActionPreference='Stop'
 $data=Join-Path $Package 'data'
 $manifest=Get-Content (Join-Path $data 'package.json') -Raw -Encoding utf8|ConvertFrom-Json
 if($manifest.RequiresUpstreamInstallation -ne $false){throw 'Package still declares an upstream prerequisite'}
-foreach($file in @('AdvancedInstaller.exe','TtsApplication.exe','SpeechSDKPatcher.exe')){if($manifest.Files.Path -match ([regex]::Escape($file)+'$')){throw "Old installer/sample payload remains: $file"}}
+if(-not (Test-Path -LiteralPath (Join-Path $Package 'TtsApplication.exe') -PathType Leaf)){throw 'Package is missing the SAPI test application'}
+foreach($file in @('AdvancedInstaller.exe','TtsApplication.exe','SpeechSDKPatcher.exe')){if($manifest.Files.Path -match ([regex]::Escape($file)+'$')){throw "Unexpected installation payload: $file"}}
 $id=[Guid]::NewGuid().ToString()
 $registry="Software\NaturalVoiceFullTests\$id"
 $target=Join-Path $PSScriptRoot ('../out/standalone-fresh-'+$id)

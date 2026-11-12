@@ -1,6 +1,10 @@
 双击 Installer.exe，选择“是”，通过 Windows 管理员确认即可安装或升级。
 完成后，完全退出并重新打开朗读软件。
 
+试听 SAPI：双击同目录的 TtsApplication.exe（64 位），在 Voice 下拉框
+选一个音色，输入文字，再点 Speak。列表能看到音色表示 SAPI 能找到它，
+听到朗读表示该音色能实际合成并播放。适配器安装一次即可反复试听。
+
 选择“否”可打开声音高级设置。卸载请用 Windows“已安装的应用”，
 或运行安装目录内的 Installer.exe /uninstall。
 

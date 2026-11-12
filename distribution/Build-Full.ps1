@@ -28,7 +28,8 @@ if(-not $SkipBuild){
  }
  Build 'HD/tools/NativeHdProbe.vcxproj' 'x64' (Join-Path $root 'out/full/hd')
  Build 'Installer/Installer.vcxproj' 'Win32' (Join-Path $root 'out/full/advanced')
- Build 'distribution/Installer.vcxproj' 'Win32' (Join-Path $root 'out/full/launcher')
+ Build 'distribution/Installer.vcxproj' 'x64' (Join-Path $root 'out/full/launcher')
+ Build 'ttsapplication/TtsApplication.vcxproj' 'x64' (Join-Path $root 'out/full/sapi-test')
 }
 # Never collect arbitrary DLLs from System32 or bundle downloaded voice models.
 $speech=@('core','extension.audio.sys','extension.embedded.tts','extension.onnxruntime','extension.telemetry')
@@ -51,6 +52,7 @@ Copy-Item -LiteralPath (Join-Path $root 'out/full/launcher/Installer.exe') -Dest
 foreach($file in @('Install-Full.ps1','使用说明.txt')){Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $Output -Force}
 foreach($file in @('HdPrepare.h','HdPrepareIntegration.zh-CN.md')){Copy-Item -LiteralPath (Join-Path $root ('HD/sapi/'+$file)) -Destination (Join-Path $Output 'sdk') -Force}
 Copy-Item -Path (Join-Path $PSScriptRoot 'licenses/*') -Destination (Join-Path $Output 'licenses') -Force
+Copy-Item -LiteralPath (Join-Path $root 'ttsapplication/LICENSE') -Destination (Join-Path $Output 'licenses/TtsApplication-MIT.txt') -Force
 Copy-Item -Path (Join-Path $root 'docs/*') -Destination (Join-Path $Output 'docs') -Force
 $src=Join-Path $root 'out/EdgeGecV2-CorrespondingSource'
 New-Item -ItemType Directory -Path $src -Force|Out-Null
@@ -63,6 +65,7 @@ Compress-Archive -Path (Join-Path $src '*') -DestinationPath (Join-Path $Output 
 $files=@(Get-ChildItem -LiteralPath $Output -Recurse -File|Where-Object{$_.Name -ne 'package.json'}|Sort-Object FullName|ForEach-Object{@{Path=$_.FullName.Substring($Output.Length+1).Replace('\','/');Sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}})
 @{Version='0.2.9-secv2-hd.1';Base='7194eca5b78d8e477793c159d731d62b6357ffbf';RequiresUpstreamInstallation=$false;Experimental=$true;SDKDistributionApprovalVerified=$false;ThirdPartyLicensingNotice='Embedded Speech SDK distribution requires separate approval under section 3; no approval was supplied. Models and Windows system runtime are excluded.';Files=$files}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $Output 'package.json') -Encoding utf8
 Copy-Item -LiteralPath (Join-Path $Output 'Installer.exe') -Destination $BundleRoot -Force
+Copy-Item -LiteralPath (Join-Path $root 'out/full/sapi-test/TtsApplication.exe') -Destination $BundleRoot -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '安装说明.txt') -Destination $BundleRoot -Force
 Compress-Archive -LiteralPath $BundleRoot -DestinationPath ($BundleRoot+'.zip') -Force
-Write-Output "独立安装测试包：$BundleRoot.zip（根目录只保留安装器、中文说明及 data）"
+Write-Output "独立安装测试包：$BundleRoot.zip（含安装器、SAPI 试听工具及中文说明）"

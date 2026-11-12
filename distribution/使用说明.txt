@@ -4,6 +4,7 @@ NaturalVoiceSAPIAdapter 独立安装测试版（0.2.9-secv2-hd.1）
 1. 将整个 ZIP 解压到一个文件夹，双击 Installer.exe，选择“是”。
 2. 阅读 licenses 中的适用条款，通过一次 Windows 管理员确认。
 3. 完全退出并重新打开朗读软件，在其声音列表中选择所需语音。
+也可以打开解压目录中的 TtsApplication.exe，在 Voice 选择音色，输入文字后点 Speak 试听。
 安装会同时放置 x64/x86 的联网 secv2、普通本地引擎、HD 引擎及公开预合成服务。
 不需要先安装上游，再覆盖多个修复 DLL。默认安装目录为
 C:\Program Files\NaturalVoiceSAPIAdapter Full。

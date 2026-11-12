@@ -70,7 +70,11 @@ static void UpdateDisplay(HWND hDlg)
     if (IsFullSettingsOnly())
     {
         for (UINT id : {IDC_INSTALL_32BIT, IDC_INSTALL_64BIT, IDC_UNINSTALL_32BIT, IDC_UNINSTALL_64BIT})
-            EnableWindow(GetDlgItem(hDlg, id), FALSE);
+        {
+            HWND button = GetDlgItem(hDlg, id);
+            EnableWindow(button, FALSE);
+            ShowWindow(button, SW_HIDE);
+        }
     }
 
     RegKey key = RegOpenEnumeratorConfigKey();

@@ -1,20 +1,31 @@
 ﻿[CmdletBinding()]
 param(
  [ValidateSet('Install','Uninstall','Plan','Configure')][string]$Action='Install',
- [string]$Source=$PSScriptRoot,
+ [string]$Source,
  [string]$Destination=(Join-Path $env:ProgramFiles 'NaturalVoiceSAPIAdapter Full'),
  [string[]]$ModelRoots=@(),
  [switch]$IgnoreLegacyInstallations,
  [string]$TestRegistryRoot,
- [switch]$TestFailAfterRegistration
+ [switch]$TestFailAfterRegistration,
+ [switch]$ShowErrorDialog
 )
 $ErrorActionPreference='Stop'
+trap {
+ if($ShowErrorDialog){
+  $message=$_.Exception.Message
+  Add-Type -AssemblyName System.Windows.Forms
+  [void][Windows.Forms.MessageBox]::Show($message,'NaturalVoiceSAPIAdapter 安装失败','OK','Error')
+  exit 3
+ }
+ break
+}
 $owner='dengxibo.NaturalVoiceSAPIAdapter.Full'
 $engine='{013AB33B-AD1A-401C-8BEE-F6E2B046A94E}'
 $enumerator='{B8B9E38F-E5A2-4661-9FDE-4AC7377AA6F6}'
 $hdEngine='{D8A46B78-87DF-4DDE-9E2A-468CE2F31D8C}'
 $prepare='{D8A46B78-87DF-4DDE-9E2A-468CE2F31D8E}'
 $Destination=[IO.Path]::GetFullPath($Destination)
+if(-not $PSBoundParameters.ContainsKey('Source')){$Source=$PSScriptRoot}
 $Source=[IO.Path]::GetFullPath($Source)
 if($TestRegistryRoot -and $TestRegistryRoot -notmatch '^Software\\NaturalVoiceFullTests\\[a-zA-Z0-9-]+$'){throw '测试注册表必须位于专用隔离目录。'}
 if($TestFailAfterRegistration -and -not $TestRegistryRoot){throw '故障注入仅允许隔离测试。'}
@@ -66,13 +77,17 @@ function Owned-Path($relative){
  if(-not $full.StartsWith($Source.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)){throw '清单路径越界。'}
  return $full
 }
+function Get-HdAppxPackage($name){
+ try{Get-AppxPackage $name -ErrorAction Stop}
+ catch{Write-Warning "无法查询 Windows 语音组件 $name，$($_.Exception.Message)"}
+}
 function Find-HdVoices {
  $roots=@($ModelRoots)+@((Join-Path $Destination 'models'),'C:\TTS')
  if(-not $IgnoreLegacyInstallations){foreach($id in $voiceIds){
   $base=[Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,[Microsoft.Win32.RegistryView]::Registry64)
   try{$key=$base.OpenSubKey('Software\Microsoft\Speech\Voices\Tokens\TtsApplicationHD-'+$id);try{if($key){$roots+= [string]$key.GetValue('ModelPath')}}finally{if($key){$key.Dispose()}}}finally{$base.Dispose()}
  }}
- $packages=@(Get-AppxPackage 'MicrosoftWindows.Voice.*' -ErrorAction SilentlyContinue)
+ $packages=@(Get-HdAppxPackage 'MicrosoftWindows.Voice.*')
  $roots+=@($packages|ForEach-Object{$_.InstallLocation})
  $folders=@()
  foreach($root in ($roots|Where-Object{$_}|Select-Object -Unique)){
@@ -104,7 +119,7 @@ if($Action -eq 'Uninstall'){
  foreach($entry in $manifest.Files){$file=Owned-Path $entry.Path;if((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $entry.Sha256){throw "文件校验失败：$($entry.Path)"}}
  $version=(Get-FileHash -LiteralPath (Join-Path $Source 'package.json')).Hash.Substring(0,16).ToLowerInvariant()
  $binaryRoot=Join-Path $Destination ('versions/'+$version)
- $runtime=@(Get-AppxPackage 'MicrosoftWindows.Client.Core' -ErrorAction SilentlyContinue|Select-Object -First 1).InstallLocation
+ $runtime=(Get-HdAppxPackage 'MicrosoftWindows.Client.Core'|Select-Object -First 1).InstallLocation
  $voices=@()
  if($runtime -and (Test-Path -LiteralPath (Join-Path $runtime 'SpeechSynthesizerExtension.dll'))){
   $runtimeVersion=[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $runtime 'SpeechSynthesizerExtension.dll')).FileVersion
