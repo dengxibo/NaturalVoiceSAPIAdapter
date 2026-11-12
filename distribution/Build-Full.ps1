@@ -33,14 +33,12 @@ if(-not $SkipBuild){
  Build 'ttsapplication/TtsApplication.vcxproj' 'x64' (Join-Path $root 'out/full/sapi-test')
 }
 # Never collect arbitrary DLLs from System32 or bundle downloaded voice models.
-$speech=@('core','extension.audio.sys','extension.telemetry')
+$speech=@('core','extension.audio.sys','extension.telemetry','extension.embedded.tts','extension.onnxruntime')
 $version='0.2.9-secv2-hd.1'
 $licensingNotice='Embedded Speech SDK distribution requires separate approval under section 3; no approval was supplied. Models and Windows system runtime are excluded.'
 if($PublicRelease){
  $version='0.2.9-secv2-hd.2'
- $licensingNotice='Embedded Speech extensions, models and Windows system runtime are excluded.'
-}else{
- $speech+=@('extension.embedded.tts','extension.onnxruntime')
+ $licensingNotice='The publisher confirmed approval to distribute the included Embedded Speech components. Models and Windows system runtime are excluded.'
 }
 $crt=@('concrt140.dll','msvcp140.dll','msvcp140_1.dll','msvcp140_2.dll','msvcp140_atomic_wait.dll','msvcp140_codecvt_ids.dll','vcruntime140.dll','vcruntime140_1.dll','vcruntime140_threads.dll')
 foreach($folder in @('x64','x86','hd','licenses','sdk','docs')){New-Item -ItemType Directory -Path (Join-Path $Output $folder) -Force|Out-Null}
@@ -72,7 +70,7 @@ foreach($file in @('LGPL-3.0.edge-tts.txt','GPL-3.0.txt')){Copy-Item -LiteralPat
 Copy-Item -LiteralPath (Join-Path $root 'EdgeGecV2/BUILD.txt') -Destination (Join-Path $src 'BUILD.txt') -Force
 Compress-Archive -Path (Join-Path $src '*') -DestinationPath (Join-Path $Output 'EdgeGecV2-CorrespondingSource.zip') -Force
 $files=@(Get-ChildItem -LiteralPath $Output -Recurse -File|Where-Object{$_.Name -ne 'package.json'}|Sort-Object FullName|ForEach-Object{@{Path=$_.FullName.Substring($Output.Length+1).Replace('\','/');Sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}})
-@{Version=$version;Base='7194eca5b78d8e477793c159d731d62b6357ffbf';RequiresUpstreamInstallation=$false;Experimental=$true;SDKDistributionApprovalVerified=$false;ThirdPartyLicensingNotice=$licensingNotice;Files=$files}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $Output 'package.json') -Encoding utf8
+@{Version=$version;Base='7194eca5b78d8e477793c159d731d62b6357ffbf';RequiresUpstreamInstallation=$false;Experimental=$true;SDKDistributionApprovalConfirmedByPublisher=[bool]$PublicRelease;ThirdPartyLicensingNotice=$licensingNotice;Files=$files}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $Output 'package.json') -Encoding utf8
 Copy-Item -LiteralPath (Join-Path $Output 'Installer.exe') -Destination $BundleRoot -Force
 Copy-Item -LiteralPath (Join-Path $root 'out/full/sapi-test/TtsApplication.exe') -Destination $BundleRoot -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '安装说明.txt') -Destination $BundleRoot -Force
