@@ -120,10 +120,11 @@ if($Action -eq 'Uninstall'){
  $version=(Get-FileHash -LiteralPath (Join-Path $Source 'package.json')).Hash.Substring(0,16).ToLowerInvariant()
  $binaryRoot=Join-Path $Destination ('versions/'+$version)
  $runtime=(Get-HdAppxPackage 'MicrosoftWindows.Client.Core'|Select-Object -First 1).InstallLocation
+ if(-not $runtime){$runtime=Join-Path $env:SystemRoot 'SystemApps/MicrosoftWindows.Client.Core_cw5n1h2txyewy'}
  $voices=@()
  if($runtime -and (Test-Path -LiteralPath (Join-Path $runtime 'SpeechSynthesizerExtension.dll'))){
   $runtimeVersion=[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $runtime 'SpeechSynthesizerExtension.dll')).FileVersion
-  if($runtimeVersion -eq '2608.11000.0.0'){$voices=@(Find-HdVoices)}else{Write-Warning "HD 扩展版本未验证：$runtimeVersion；本次仅安装联网及普通语音引擎。"}
+  if($runtimeVersion -in @('2608.11000.0.0','2609.28000.0.0')){$voices=@(Find-HdVoices)}else{Write-Warning "HD 扩展版本未验证：$runtimeVersion；本次仅安装联网及普通语音引擎。"}
  }
  if($Action -eq 'Plan'){@{Action=$Action;Destination=$Destination;BinaryRoot=$binaryRoot;HDVoices=$voices;Runtime=$runtime;Files=$manifest.Files.Count}|ConvertTo-Json -Depth 8;return}
 }

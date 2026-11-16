@@ -8,7 +8,7 @@ param(
 )
 $ErrorActionPreference='Stop'
 $root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-if(-not $Output){$Output=Join-Path $root $(if($PublicRelease){'dist/NaturalVoiceSAPIAdapter_v0.2.9-secv2-hd.2_x86_x64'}else{'dist/Standalone'})}
+if(-not $Output){$Output=Join-Path $root $(if($PublicRelease){'dist/NaturalVoiceSAPIAdapter_v0.2.9-secv2-hd.3_x86_x64'}else{'dist/Standalone'})}
 $BundleRoot=[IO.Path]::GetFullPath($Output)
 $Output=Join-Path $BundleRoot 'data'
 if(-not $MSBuild){
@@ -37,7 +37,7 @@ $speech=@('core','extension.audio.sys','extension.telemetry','extension.embedded
 $version='0.2.9-secv2-hd.1'
 $licensingNotice='Embedded Speech SDK distribution requires separate approval under section 3; no approval was supplied. Models and Windows system runtime are excluded.'
 if($PublicRelease){
- $version='0.2.9-secv2-hd.2'
+ $version='0.2.9-secv2-hd.3'
  $licensingNotice='The publisher confirmed approval to distribute the included Embedded Speech components. Models and Windows system runtime are excluded.'
 }
 $crt=@('concrt140.dll','msvcp140.dll','msvcp140_1.dll','msvcp140_2.dll','msvcp140_atomic_wait.dll','msvcp140_codecvt_ids.dll','vcruntime140.dll','vcruntime140_1.dll','vcruntime140_threads.dll')

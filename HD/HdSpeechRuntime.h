@@ -9,7 +9,7 @@
 #include "HdPcmTap.h"
 
 // Experimental ABI recovered from the matching Microsoft public symbols.
-// Only the locally verified extension version is accepted; unknown versions
+// Only locally verified extension versions are accepted; unknown versions
 // fail explicitly instead of calling an unverified vtable layout.
 class HdSpeechRuntime {
     winrt::com_ptr<IInspectable> voice;
@@ -28,7 +28,9 @@ public:
         VS_FIXEDFILEINFO* version = nullptr;
         UINT size = 0;
         if (!VerQueryValueW(bytes.get(), L"\\", reinterpret_cast<void**>(&version), &size) ||
-            size < sizeof(VS_FIXEDFILEINFO) || version->dwFileVersionMS != MAKELONG(11000, 2608) ||
+            size < sizeof(VS_FIXEDFILEINFO) ||
+            (version->dwFileVersionMS != MAKELONG(11000, 2608) &&
+             version->dwFileVersionMS != MAKELONG(28000, 2609)) ||
             version->dwFileVersionLS != 0)
             throw winrt::hresult_error(E_NOTIMPL, L"尚未验证此系统语音扩展版本，请更新适配代码。");
 
